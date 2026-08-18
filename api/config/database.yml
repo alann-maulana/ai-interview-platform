@@ -20,7 +20,8 @@ development:
 
 test:
   <<: *default
-  database: rakamin_test
+  database: defaultdb
+  schema_search_path: "ai_interview_test,ai_interview,public"
 
 staging:
   <<: *default

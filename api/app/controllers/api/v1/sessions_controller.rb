@@ -175,7 +175,8 @@ module Api
           started_at:       session.started_at,
           ended_at:         session.ended_at,
           duration_seconds: session.duration_seconds,
-          created_at:       session.created_at
+          created_at:       session.created_at,
+          portfolio_status: session.portfolio&.generation_status
         }
       end
 

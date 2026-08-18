@@ -32,10 +32,17 @@ function SessionRow({
   copiedId: number | null;
 }) {
   const navigate = useNavigate();
-  const isLive = session.status === "active";
-  const isEnded = session.status === "ended";
+  const isLive    = session.status === "active";
+  const isEnded   = session.status === "ended";
   const isPending = session.status === "pending";
   const displayName = session.candidate_name || `Candidate ${index}`;
+
+  // Portfolio generation state for ended sessions
+  const portfolioStatus     = session.portfolio_status;
+  const portfolioGenerating = isEnded && (portfolioStatus === "pending" || portfolioStatus === "generating");
+  const portfolioFailed     = isEnded && portfolioStatus === "failed";
+  const portfolioReady      = isEnded && portfolioStatus === "complete";
+  const portfolioUnknown    = isEnded && !portfolioStatus;
 
   return (
     <div className="flex items-center justify-between py-3 px-4">
@@ -79,6 +86,26 @@ function SessionRow({
           </span>
         )}
 
+        {/* Portfolio generation status badges */}
+        {portfolioGenerating && (
+          <span className="flex items-center gap-1 text-xs text-amber-600">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            Analyzing…
+          </span>
+        )}
+        {portfolioFailed && (
+          <span className="flex items-center gap-1 text-xs text-destructive" title="Portfolio generation failed">
+            <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
+            Analysis failed
+          </span>
+        )}
+        {portfolioReady && (
+          <span className="flex items-center gap-1 text-xs text-teal-600" title="Portfolio ready">
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+            Ready
+          </span>
+        )}
+
         <div className="flex items-center gap-1.5">
           {isPending && (
             <Button
@@ -104,7 +131,7 @@ function SessionRow({
               <Eye className="h-3 w-3 mr-1" /> Monitor
             </Button>
           )}
-          {isEnded && session.end_reason !== "error" && (
+          {isEnded && session.end_reason !== "error" && (portfolioReady || portfolioUnknown) && (
             <Button
               variant="outline"
               size="sm"
@@ -112,6 +139,16 @@ function SessionRow({
               onClick={() => navigate(`/assessments/${assessmentId}/sessions/${session.id}/portfolio`)}
             >
               Results
+            </Button>
+          )}
+          {portfolioFailed && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs text-destructive border-destructive/40"
+              onClick={() => navigate(`/assessments/${assessmentId}/sessions/${session.id}/portfolio`)}
+            >
+              Retry
             </Button>
           )}
         </div>

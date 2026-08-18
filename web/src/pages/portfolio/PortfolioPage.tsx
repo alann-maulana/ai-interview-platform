@@ -186,20 +186,50 @@ export default function PortfolioPage() {
       {/* Ready state */}
       {!generating && portfolio?.generation_status === "complete" && (
         <>
+          {/* Generated timestamp */}
+          {portfolio.generated_at && (
+            <p className="text-xs text-muted-foreground">
+              Analyzed {new Date(portfolio.generated_at).toLocaleString()}
+            </p>
+          )}
+
+          {/* Empty state — AI returned no skill data */}
+          {portfolio.skills.length === 0 && (
+            <div className="border rounded-lg p-10 text-center space-y-2">
+              <p className="text-sm font-medium">No skills assessed</p>
+              <p className="text-xs text-muted-foreground">
+                The AI did not extract any skill data from this session's transcript.
+                This may happen if the session ended before any skills were discussed.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  await sessionsApi.regeneratePortfolio(Number(sessionId));
+                  setGenerating(true);
+                }}
+              >
+                <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Regenerate
+              </Button>
+            </div>
+          )}
+
           {/* Configured skills */}
-          <div className="space-y-3">
-            <h2 className="text-sm font-semibold">Configured Skills</h2>
-            {portfolio.skills
-              .filter((s) => !s.is_discovered)
-              .map((skill) => (
-                <SkillPortfolioCard
-                  key={skill.id}
-                  skill={skill}
-                  override={overrides[skill.id]}
-                  onOverrideSaved={(o) => handleOverrideSaved(skill.id, o)}
-                />
-              ))}
-          </div>
+          {portfolio.skills.filter((s) => !s.is_discovered).length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold">Configured Skills</h2>
+              {portfolio.skills
+                .filter((s) => !s.is_discovered)
+                .map((skill) => (
+                  <SkillPortfolioCard
+                    key={skill.id}
+                    skill={skill}
+                    override={overrides[skill.id]}
+                    onOverrideSaved={(o) => handleOverrideSaved(skill.id, o)}
+                  />
+                ))}
+            </div>
+          )}
 
           {/* Discovered skills */}
           {portfolio.skills.some((s) => s.is_discovered) && (

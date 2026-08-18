@@ -45,6 +45,7 @@ export interface Session {
   ended_at?: string;
   duration_seconds?: number;
   created_at?: string;
+  portfolio_status?: "pending" | "generating" | "complete" | "failed" | null;
 }
 
 export interface CoverageSkill {
@@ -90,7 +91,7 @@ export interface PortfolioSkill {
   skill_id?: number;
   skill_label: string;
   is_discovered: boolean;
-  ai_level: string;       // "L1" | "L2" | "L3" | "L4" | "L5"
+  ai_level: number;       // integer 1–5, matches API (was wrongly typed as string)
   ai_confidence: string;  // "high" | "medium" | "low"
   evidence: string[];
   competency_summary: string;
@@ -129,11 +130,12 @@ export type SkillComparisonResult = "match" | "gap" | "exceed" | "not_assessed";
 
 export interface SkillComparison {
   skill_label: string;
-  required_level: number;
+  expected_level: number;  // P0 fix: was "required_level" which never matched the API key
   candidate_level?: number;
   result: SkillComparisonResult;
   delta?: number;
-  is_override?: boolean;
+  is_override: boolean;    // P0 fix: now guaranteed present from API
+  confidence?: "high" | "medium" | "low";
 }
 
 export interface FitGapReport {

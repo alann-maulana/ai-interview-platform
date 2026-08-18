@@ -3,7 +3,7 @@ import LevelBadge from "./LevelBadge";
 import ConfidenceIndicator from "./ConfidenceIndicator";
 import OverridePanel from "./OverridePanel";
 import { Zap } from "lucide-react";
-import { parseLevel } from "@/utils/constants";
+import { LEVEL_LABELS } from "@/utils/constants";
 import type { PortfolioSkill, AssessorOverride } from "@/types";
 
 interface SkillPortfolioCardProps {
@@ -17,7 +17,7 @@ export default function SkillPortfolioCard({
   override,
   onOverrideSaved,
 }: SkillPortfolioCardProps) {
-  const effectiveLevel = override?.override_level ?? parseLevel(skill.ai_level);
+  const effectiveLevel = override?.override_level ?? skill.ai_level;
 
   return (
     <Card>
